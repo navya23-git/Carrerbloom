@@ -21,6 +21,8 @@ public class Application {
     @Column(nullable = false)
     private String status;
 
+    @Column(nullable = false)
+  private int score;
     public Application() {}
 
     // Getters and Setters
@@ -52,4 +54,13 @@ public class Application {
         this.status = status;
     }
 
+	public int getScore() {
+		return score;
+	}
+
+	public void setScore(int score) {
+		this.score = score;
+	}
+
+	
 }

@@ -2,8 +2,10 @@ package com.example.job.filter;
 
 import com.example.job.util.JwtUtil;
 import io.jsonwebtoken.Claims;
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -35,24 +37,22 @@ public class JwtFilter extends OncePerRequestFilter {
 
             try {
                 Claims claims = jwtUtil.extractClaims(token);
-                String email = claims.getSubject();
-                String role = claims.get("role", String.class);
 
-                // 🔑 IMPORTANT: authority must EXACTLY match @PreAuthorize
-                SimpleGrantedAuthority authority =
-                        new SimpleGrantedAuthority(role.toUpperCase());
+                String email = claims.getSubject();
+                String role = claims.get("role", String.class); // ROLE_STUDENT / ROLE_RECRUITER
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 email,
                                 null,
-                                List.of(authority)
+                                List.of(new SimpleGrantedAuthority(role))
                         );
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                SecurityContextHolder.getContext()
+                        .setAuthentication(authentication);
 
             } catch (Exception e) {
-                System.out.println("JWT ERROR: " + e.getMessage());
+                SecurityContextHolder.clearContext();
             }
         }
 

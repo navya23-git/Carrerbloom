@@ -2,13 +2,14 @@ package com.example.job.security;
 
 import com.example.job.filter.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.*;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.*;
 
@@ -32,18 +33,29 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
             .authorizeHttpRequests(auth -> auth
-            		
+
+                // PUBLIC
                 .requestMatchers(
                         "/api/user/login",
-                        "/api/user/register"
+                        "/api/user/register",
+                        "/api/jobs/active"
                 ).permitAll()
+
                 .requestMatchers("/api/jobs/post").hasRole("RECRUITER")
+                .requestMatchers("/api/jobs/my").hasRole("RECRUITER")
+                .requestMatchers("/api/recruiter/**").hasRole("RECRUITER")
+
+                // student
+                .requestMatchers("/api/jobs/active").hasRole("STUDENT")
                 .requestMatchers("/api/applications/apply").hasRole("STUDENT")
                 .requestMatchers("/api/aptitude/**").hasRole("STUDENT")
-                .requestMatchers("/api/recruiter/**").hasRole("RECRUITER")
+
+
                 .anyRequest().authenticated()
             )
+
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             );
@@ -61,8 +73,11 @@ public class SecurityConfig {
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
     }
 }
+
+

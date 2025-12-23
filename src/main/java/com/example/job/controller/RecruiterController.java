@@ -2,6 +2,7 @@ package com.example.job.controller;
 
 import java.util.List;
 
+
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,7 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.job.dto.PassedCandidateDTO;
-import com.example.job.entity.Application;
+
+
 import com.example.job.service.ApplicationService;
 
 @RestController
@@ -26,6 +28,7 @@ public class RecruiterController {
     public List<PassedCandidateDTO> getPassedCandidates(@PathVariable Long jobId) {
         return service.getPassedCandidatesForJob(jobId);
     }
+
 
 }
 
